@@ -3,37 +3,63 @@
 from flask import Flask, jsonify , render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, DateTime
+from extension import db  # Import SQLAlchemy từ extension.py
 from datetime import datetime, timezone
 import config  # Lấy thông tin kết nối từ file config.py
+from auth import requires_role, requires_self_or_role
+from models import employees ,salaries,attendance, Employees , Users # Import các model từ models.py
+from sqlalchemy import text  # Import text từ SQLAlchemy
+
 
 app = Flask(__name__)
 
-# Khai báo nhiều kết nối CSDL (SQL Server và MySQL) thông qua SQLAlchemy binds
-app.config['SQLALCHEMY_BINDS'] = {
-    'sqlserver': config.SQL_SERVER_CONN,
-    'mysql': config.MYSQL_CONN
-}
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Tắt cảnh báo không cần thiết
+# Áp dụng cấu hình từ config.py
+app.config.from_object(config)
 
-# Khởi tạo SQLAlchemy
-db = SQLAlchemy(app)
+# Khởi tạo SQLAlchemy với app
+db.init_app(app)
+
+# Kiểm tra kết nối
+with app.app_context():
+    try:
+        # Thực hiện truy vấn đơn giản đến SQL Server
+        sqlserver_engine = db.engines['sqlserver']
+        with sqlserver_engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            print("Kết nối đến SQL Server thành công!")
+
+        # Thực hiện truy vấn đơn giản đến MySQL
+        mysql_engine = db.engines['mysql']
+        with mysql_engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            print("Kết nối đến MySQL thành công!")
+
+        # Thực hiện truy vấn đơn giản đến HR_DASHBOARD
+        userdb_engine = db.engines['userdb']
+        with userdb_engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            print("Kết nối đến HR_DASHBOARD thành công!")
+
+    except Exception as e:
+        print(f"Lỗi kết nối: {e}")
+
 
 # -------------------- DANH SÁCH SQL SERVER -------------------- chưa có csdl
 
 # Đại diện cho bảng Employees trong CSDL SQL Server    
-class Employees(db.Model):
-    __tablename__ = "Employees"
-    __bind_key__ = "sqlserver"  # Bắt buộc để tránh lỗi UnboundExecutionError
-    EmployeeID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    FullName = db.Column(db.String(100), nullable=False)
-    DateOfBirth = db.Column(db.Date, nullable=False)
-    Gender = db.Column(db.String(10))
-    PhoneNumber = db.Column(db.String(15))
-    Email = db.Column(db.String(100))
-    HireDate = db.Column(db.Date , nullable=False)
-    DepartmentID = db.Column(db.Integer)
-    PositionID = db.Column(db.Integer)
-    Status = db.Column(db.String(50))
+# class Employees(db.Model):
+#     __tablename__ = "Employees"
+#     __bind_key__ = "sqlserver"  # Bắt buộc để tránh lỗi UnboundExecutionError
+#     EmployeeID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     FullName = db.Column(db.String(100), nullable=False)
+#     DateOfBirth = db.Column(db.Date, nullable=False)
+#     Gender = db.Column(db.String(10))
+#     PhoneNumber = db.Column(db.String(15))
+#     Email = db.Column(db.String(100))
+#     HireDate = db.Column(db.Date , nullable=False)
+#     DepartmentID = db.Column(db.Integer)
+#     PositionID = db.Column(db.Integer)
+#     Status = db.Column(db.String(50))
 
     
     
@@ -41,111 +67,162 @@ class Employees(db.Model):
 # -------------------- DANH SÁCH MYSQL --------------------
 
 # Danh sách nhân viên trong PAYROLL MySQL
-class employees(db.Model):
-    __tablename__ = "employees"
-    __bind_key__ = "mysql"
-    EmployeeID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    FullName = db.Column(db.String(100), nullable=False)
-    DepartmentID = db.Column(db.Integer)
-    PositionID = db.Column(db.Integer)
-    Status = db.Column(db.String(50))
+# class employees(db.Model):
+#     __tablename__ = "employees"
+#     __bind_key__ = "mysql"
+#     EmployeeID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     FullName = db.Column(db.String(100), nullable=False)
+#     DepartmentID = db.Column(db.Integer)
+#     PositionID = db.Column(db.Integer)
+#     Status = db.Column(db.String(50))
 
 
-# Danh sách Lương trong PAYROLL MySQL
-class salaries(db.Model):
-    __tablename__ = "salaries"
-    __bind_key__ = "mysql"
-    SalaryID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    EmployeeID = db.Column(db.Integer, db.ForeignKey("employees.EmployeeID"))
-    SalaryMonth = db.Column(db.Date)
-    BaseSalary = db.Column(db.Float)
-    Bonus = db.Column(db.Float)
-    Deductions = db.Column(db.Float)
-    NetSalary = db.Column(db.Float)
-# Danh sách chấm công trong PAYROLL MySQL
-class attendance(db.Model):
-    __tablename__ = "attendance"
-    __bind_key__ = "mysql"  # Bắt buộc để tránh lỗi UnboundExecutionError
-    AttendanceID = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    EmployeeID = db.Column(db.Integer, db.ForeignKey("employees.EmployeeID"))
-    WorkDays = db.Column(db.Integer)
-    AbsentDay = db.Column(db.Integer)
-    LeavesDay = db.Column(db.Integer)
-    AttendanceMon = db.Column(db.Date)
+# # Danh sách Lương trong PAYROLL MySQL
+# class salaries(db.Model):
+#     __tablename__ = "salaries"
+#     __bind_key__ = "mysql"
+#     SalaryID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     EmployeeID = db.Column(db.Integer, db.ForeignKey("employees.EmployeeID"))
+#     SalaryMonth = db.Column(db.Date)
+#     BaseSalary = db.Column(db.Float)
+#     Bonus = db.Column(db.Float)
+#     Deductions = db.Column(db.Float)
+#     NetSalary = db.Column(db.Float)
+# # Danh sách chấm công trong PAYROLL MySQL
+# class attendance(db.Model):
+#     __tablename__ = "attendance"
+#     __bind_key__ = "mysql"  # Bắt buộc để tránh lỗi UnboundExecutionError
+#     AttendanceID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     EmployeeID = db.Column(db.Integer, db.ForeignKey("employees.EmployeeID"))
+#     WorkDays = db.Column(db.Integer)
+#     AbsentDay = db.Column(db.Integer)
+#     LeavesDay = db.Column(db.Integer)
+#     AttendanceMon = db.Column(db.Date)
 
 
 # -------------------- ROUTE: TRANG CHỦ --------------------
 
 # Trang chủ
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("login_1.html")
+    if request.method == "POST":
+        # Lấy thông tin đăng nhập từ form
+        username = request.form.get("username")
+        password = request.form.get("password")
+        
+        print(username, password)  # Debug
 
+        if not username or not password:
+            return render_template("login_1.html", error="Tên đăng nhập và mật khẩu là bắt buộc")
+
+        # Truy vấn người dùng từ cơ sở dữ liệu
+        user = Users.query.filter_by(User_Name=username, User_Password=password).first()
+
+        if not user:
+            return render_template("login_1.html", error="Tên đăng nhập hoặc mật khẩu không đúng")
+
+        # Kiểm tra vai trò và chuyển hướng
+        if user.User_Role == 1:  # Admin
+            return redirect(url_for("admin_dashboard"))
+        elif user.User_Role == 2:  # HR Manager
+            return redirect(url_for("hr_dashboard"))
+        elif user.User_Role == 3:  # Payroll Manager
+            return redirect(url_for("payroll_dashboard"))
+        elif user.User_Role == 4:  # Employee
+            return redirect(url_for("employee_dashboard"))
+        else:
+            return render_template("login_1.html", error="Vai trò không hợp lệ")
+
+    # Nếu là GET, hiển thị trang đăng nhập
+    return render_template("login_1.html")
+@app.route("/admin-dashboard")
+def admin_dashboard():
+    return render_template("admin_dashboard.html")
+
+@app.route("/hr-dashboard")
+def hr_dashboard():
+    return render_template("hr_dashboard.html")
+
+@app.route("/payroll-dashboard")
+def payroll_dashboard():
+    return render_template("payroll_dashboard.html")
+
+@app.route("/employee-dashboard")
+def employee_dashboard():
+    return render_template("employee_dashboard.html")
 # -------------------- ROUTE: LẤY DANH SÁCH NHÂN VIÊN --------------------
 
             
 @app.route('/employees', methods=['GET'])
+@requires_role('2'or'1')  # Chỉ HR Manager (Role = 2) hoặc Admin (Role = 1) được phép truy cập
+@requires_self_or_role('4')  # Nhân viên chỉ xem thông tin của chính họ
 def get_employees():
-# IN DANH SÁCH NHÂN VIÊN
-    # Lấy danh sách nhân viên từ SQL Server
-    nhan_viens_sql = Employees.query.all()
+    # IN DANH SÁCH NHÂN VIÊN
+    try:
+        # Lấy danh sách nhân viên từ SQL Server
+        nhan_viens_sql = Employees.query.all()
 
-    # Lấy danh sách nhân viên từ MySQL (bao gồm cả PhongBan và ChucVu)
-    nhan_viens_mysql = employees.query.all()
+        # Lấy danh sách nhân viên từ MySQL (bao gồm cả PhongBan và ChucVu)
+        nhan_viens_mysql = employees.query.all()
 
-    # Chuyển dữ liệu MySQL thành dictionary để dễ tìm kiếm theo EmployeeID
-    mysql_dict = {nv.EmployeeID: nv for nv in nhan_viens_mysql}
+        # Chuyển dữ liệu MySQL thành dictionary để dễ tìm kiếm theo EmployeeID
+        mysql_dict = {nv.EmployeeID: nv for nv in nhan_viens_mysql}
 
-    # Danh sách nhân viên kết hợp
-    merged_data = []
+        # Danh sách nhân viên kết hợp
+        merged_data = []
 
-    for nv_sql in nhan_viens_sql:
-        if nv_sql.EmployeeID in mysql_dict:
-            nv_mysql = mysql_dict[nv_sql.EmployeeID]
+        for nv_sql in nhan_viens_sql:
+            if nv_sql.EmployeeID in mysql_dict:
+                nv_mysql = mysql_dict[nv_sql.EmployeeID]
+                merged_data.append({
+                    "EmployeeID": nv_sql.EmployeeID,
+                    "FullName": nv_sql.FullName,
+                    "DateOfBirth": nv_sql.DateOfBirth,
+                    "PhoneNumber": nv_sql.PhoneNumber,
+                    "Email": nv_sql.Email,
+                    "HireDate": nv_sql.HireDate,
+                    "DepartmentID": getattr(nv_sql, "DepartmentID", "N/A"),
+                    "PositionID": getattr(nv_sql, "PositionID", "N/A"),
+                    "Status": nv_sql.Status
+                })
+                del mysql_dict[nv_sql.EmployeeID]  # Xóa để tránh bị lặp lại
+            else:
+                merged_data.append({
+                    "EmployeeID": nv_sql.EmployeeID,
+                    "FullName": nv_sql.FullName,
+                    "DateOfBirth": nv_sql.DateOfBirth,
+                    "PhoneNumber": nv_sql.PhoneNumber,
+                    "Email": nv_sql.Email,
+                    "HireDate": nv_sql.HireDate,
+                    "DepartmentID": getattr(nv_sql, "DepartmentID", "N/A"),
+                    "PositionID": getattr(nv_sql, "PositionID", "N/A"),
+                    "Status": nv_sql.Status
+                })
+
+        # Thêm các nhân viên chỉ có trong MySQL (sau khi loại bỏ trùng lặp)
+        for nv_mysql in mysql_dict.values():
             merged_data.append({
-                "EmployeeID": nv_sql.EmployeeID,
-                "FullName": nv_sql.FullName,
-                "DateOfBirth": nv_sql.DateOfBirth,
-                "PhoneNumber": nv_sql.PhoneNumber,
-                "Email": nv_sql.Email,
-                "HireDate": nv_sql.HireDate,
-                "DepartmentID": getattr(nv_sql, "DepartmentID", "N/A"),
-                "PositionID": getattr(nv_sql, "PositionID", "N/A"),
-                "Status": nv_sql.Status
-            })
-            del mysql_dict[nv_sql.EmployeeID]  # Xóa để tránh bị lặp lại
-        else:
-            merged_data.append({
-                "EmployeeID": nv_sql.EmployeeID,
-                "FullName": nv_sql.FullName,
-                "DateOfBirth": nv_sql.DateOfBirth,
-                "PhoneNumber": nv_sql.PhoneNumber,
-                "Email": nv_sql.Email,
-                "HireDate": nv_sql.HireDate,
-                "DepartmentID": getattr(nv_sql, "DepartmentID", "N/A"),
-                "PositionID": getattr(nv_sql, "PositionID", "N/A"),
-                "Status": nv_sql.Status
-            })
-
-    # Thêm các nhân viên chỉ có trong MySQL (sau khi loại bỏ trùng lặp)
-    for nv_mysql in mysql_dict.values():
-        merged_data.append({
                 "EmployeeID": nv_mysql.EmployeeID,
                 "FullName": nv_mysql.FullName,
                 "DepartmentID": nv_mysql.DepartmentID,
                 "PositionID": nv_mysql.PositionID,
                 "Status": nv_mysql.Status,
-
                 "DateOfBirth": getattr(nv_mysql, "DateOfBirth", "N/A"),
                 "PhoneNumber": getattr(nv_mysql, "PhoneNumber", "N/A"),
                 "Email": getattr(nv_mysql, "Email", "N/A"),
                 "HireDate": getattr(nv_mysql, "HireDate", "N/A")
-        })
-    return render_template("Add_Employee_2.html", nhan_viens=merged_data)
+            })
+
+        return render_template("Add_Employee_2.html", nhan_viens=merged_data)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # -------------------- ROUTE: LẤY DANH SÁCH LƯƠNG (MY SQL) --------------------
 
 @app.route('/payrolls', methods=['GET'])
+@requires_role('3'or'1')  # Chỉ Payroll Manager hoặc Admin mới được phép truy cập
+@requires_self_or_role('4')  # Nhân viên chỉ xem thông tin của chính họ
 def get_payrolls():
     
     # Lấy bảng lương từ MySQL
@@ -176,6 +253,7 @@ def get_payrolls():
 
 # Trang thêm nhân viên
 @app.route("/add-employee", methods=["POST"])
+@requires_role('2'or'1')  # Chỉ HR Manager hoặc Admin mới được phép truy cập
 def them_nhan_vien():
     if request.method == "POST":
         EmployeeID = request.form[""]
@@ -229,6 +307,7 @@ def them_nhan_vien():
 # -------------------- ROUTE: CẬP NHẬT THÔNG TIN NHÂN VIÊN --------------------
 
 @app.route("/update-employee", methods=["PUT"])
+@requires_role('2'or'1') 
 def update_employee():
     data = request.get_json()
 
@@ -273,6 +352,7 @@ def update_employee():
 # -------------------- ROUTE: XÓA THÔNG TIN NHÂN VIÊN --------------------
 
 @app.route("/delete-employee", methods=["DELETE"])
+@requires_role('2'or'1')  # Chỉ HR Manager hoặc Admin mới được phép truy cập
 def delete_employee():
     data = request.get_json()
     ma_nv = data.get("EmployeeID")
@@ -309,6 +389,7 @@ def delete_employee():
 
 # -------------------- ROUTE: LẤY DỮ LIỆU CHẤM CÔNG --------------------
 @app.route("/attendance", methods=["GET"])
+@requires_role('3'or'1')  # Chỉ Payroll Manager hoặc Admin mới được phép truy cập
 def get_attendance():
     try:
         # Lấy toàn bộ dữ liệu chấm công từ bảng attendance (PAYROLL)
@@ -336,6 +417,7 @@ def get_attendance():
     # -------------------- ROUTE: BÁO CÁO NHÂN SỰ --------------------
 
 @app.route("/reports", methods=["GET"])
+@requires_role('2'or'1')  # Chỉ HR Manager hoặc Admin mới được phép truy cập
 def bao_cao_nhan_su():
     # Truy vấn dữ liệu tổng số nhân viên theo phòng ban
     by_department = db.session.query(
@@ -380,5 +462,6 @@ def report_page():
 if __name__ == '__main__':
     print(app.url_map)
     print(app.config["SQLALCHEMY_DATABASE_URI"])
+
     app.run(debug=True)
 

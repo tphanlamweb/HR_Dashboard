@@ -4,3 +4,5 @@ dist/
 # Từ main
 .env
 *.log
+__pycache__/
+*.pyc
