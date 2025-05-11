@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payroll and Attendance Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f7fb;
+    }
+
+    .container {
+      display: flex;
+    }
+    
+
+    .sidebar {
+      width: 220px;
+      background-color: #1a2c55;
+      color: white;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    .sidebar .logo {
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      padding: 10px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar li.active {
+      background-color: #4a90e2;
+      border-radius: 8px;
+      padding-left: 10px;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .search-bar button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #4a90e2;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background-color: #ffc107;
+      color: #000;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table th, table td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+    }
+
+    table th {
+      background-color: #f0f2f5;
+    }
+
+    a {
+      color: #4a90e2;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      width: 90%;
+      max-width: 900px;
+      border-radius: 15px;
+      padding: 20px;
+      animation: fadeIn 0.3s ease-in-out;
+      position: relative;
+    }
+
+    .modal-header {
+      background: #4a90e2;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: #eee;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .modal-buttons button.active {
+      background-color: #4a90e2;
+      color: white;
+    }
+
+    .salary-filter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .salary-filter select {
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .modal-table th, .modal-table td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    .modal-footer {
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    .modal-footer button {
+      padding: 8px 16px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .close-btn:hover {
+      color: #333;
+    }
+
+    .attendance-type {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      color: white;
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: 5% auto;
+      padding: 30px;
+      border-radius: 10px;
+      width: 50%; /* Adjust modal width */
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+  }
+  
+  .section-header h2 {
+      margin: 0;
+  }
+  
+  .actions {
+      margin-bottom: 20px;
+  }
+  
+  .btn {
+      padding: 10px 20px;
+      margin-right: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+  }
+  
+  .add {
+      background-color: #3182ce;
+      color: white;
+  }
+  
+  .update {
+      background-color: #4a90e2;
+      color: white;
+  }
+  
+  button:hover {
+      opacity: 0.8;
+  }
+  
+  table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  tr{
+    text-align: center;
+    
+  }
+  
+  th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+  }
+  
+  th {
+      background-color: #f0f4fa;
+      font-weight: bold;
+  }
+  
+  td {
+      background-color: #f9f9f9;
+  }
+  
+  td button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+  }
+  
+  td button:hover {
+      background-color: #45a049;
+  }
+  
+  /* General Reset */
+  * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      background-color: rgba(0,0,0,0.4); /* Black with opacity */
+      overflow: auto; /* Enable scroll if needed */
+    }
+
+
+    /* Header Styling */
+    h2 {
+      text-align: center;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+
+        /* Close button styling */
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      cursor: pointer;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+    }
+
+    /* Form grid styling */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    
+    input {
+      padding: 12px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      width: 100%;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+    }
+    
+    input:focus {
+      border-color: #3182ce;
+      outline: none;
+    }
+
+    /* Net Salary Styling */
+    .net-salary {
+      grid-column: span 2;
+      font-size: 1.2em;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+    
+    .net-amount {
+      color: #3182ce;
+    }
+
+    /* Update Button */
+    button.update {
+      grid-column: span 2;
+      padding: 5px 15px;
+      font-size: 1.1em;
+      border-radius: 8px;
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 70px;
+      margin-left: 5px;
+    }
+
+    button.update:hover {
+      background-color: #2563eb;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+      .modal-content {
+        width: 90%;
+        padding: 20px;
+      }
+    
+      .form-grid {
+        grid-template-columns: 1fr; /* Stack form fields on mobile */
+      }
+    }
+    
+
+    .attendance-type.Work { background-color: #4caf50; }
+    .attendance-type.Licensed { background-color: #2196f3; }
+    .attendance-type.Late { background-color: #ff9800; }
+    .attendance-type.Absent { background-color: #f44336; }
+    .attendance-type.Overtime { background-color: #9c27b0; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h1 class="logo">HRD</h1>
+      <ul>
+        <li><span>🏢</span> Employee</li>
+        <li class="active"><span>💰</span> Salary</li>
+        <li><span>🏢</span> Department</li>
+        <li><span>📊</span> Analytic</li>
+        <li><span>🔔</span> Notification</li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="search-bar">
+        <input type="text" placeholder="Search Employee by ID, name, department, position" />
+        <button>Search</button>
+      </div>
+
+      <div class="content">
+        <h2>Payroll and Attendance Management</h2>
+        <button class="edit-btn" id="openEditSalary">✏️ Edit Salary</button>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Salary ID</th>
+              <th>Position</th>
+              <th>Department ID</th>
+              <th>Base salary</th>
+              <th>Bonus/Minus</th>
+              <th>Net salary</th>
+              <th>Specifically</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>00123</td>
+              <td>ThanhPhan</td>
+              <td>1122</td>
+              <td>Senior Data Analyst</td>
+              <td>0001</td>
+              <td>20.000.000</td>
+              <td>500.000</td>
+              <td>20.500.000</td>
+              <td><a href="#">Details</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+<!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <div class="search-group">
+          <input type="text" placeholder="Search Employee by ID, name, department, position" />
+          <button class="search-btn">Search</button>
+        </div>
+        
+        <div class="user-info">
+          <span>Ms. Thuy</span>
+          <div class="avatar"></div>
+        </div>
+      </header>
+
+  <!-- Salary Detail Modal -->
+  <div class="modal" id="salaryModal">
+    <div class="modal-content">
+      <div class="modal-header">Payroll and Attendance Management</div>
+      <div class="modal-body">
+        <div class="modal-buttons">
+          <button class="active" id="salaryTab">View Salary History</button>
+          <button id="attendanceTab">View Attendance Data</button>
+        </div>
+
+        <div id="salaryContent">
+          <div class="salary-filter">
+            <span>Salary History by Month</span>
+            <select>
+              <option>04/2024</option>
+              <option>03/2024</option>
+              <option>02/2024</option>
+            </select>
+          </div>
+          <p><strong>Salary History by Month from PAYROLL</strong></p>
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Base Salary</th>
+                <th>Bonus/Minus</th>
+                <th>Deduction</th>
+                <th>Net Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12/2024</td>
+                <td>15.000.000</td>
+                <td>0</td>
+                <td>0</td>
+                <td>15.000.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        
+
+        <div id="attendanceContent" style="display: none;">
+          <div class="salary-filter">
+            <span>Attendance by Month</span>
+            <select>
+              <option>04/2024</option>
+              <option>03/2024</option>
+              <option>02/2024</option>
+            </select>
+          </div>
+          <p><strong>Attendance Data</strong></p>
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-04-01</td>
+                <td>Work</td>
+                <td>08:00</td>
+                <td>17:00</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>2025-04-02</td>
+                <td>Licensed</td>
+                <td>-</td>
+                <td>-</td>
+                <td>Sick leave</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeSalaryModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Edit Salary -->
+   <div class="modal" id="editSalaryModal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>Edit Salary Minh Thanh</h2>
+      <form>
+        <div class="form-grid">
+          <label>Employee ID
+            <input type="text" value="99334" />
+          </label>
+          <label>Bonus
+            <input type="text" value="0" />
+          </label>
+          <label>Salary ID
+            <input type="text" value="1122" />
+          </label>
+          <label>Deduction
+            <input type="text" value="1.000.000" />
+          </label>
+          <label>Base Salary
+            <input type="text" value="15.000.000" />
+          </label>
+          <label>Create At
+            <input type="text" value="Good" />
+          </label>
+        </div>
+        <div class="net-salary">
+          <span>Net Salary: 14.000.000</span>
+          <button type="submit" class="btn update">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  
+
+  <script>
+    const detailLinks = document.querySelectorAll('a');
+    const salaryModal = document.getElementById('salaryModal');
+    const closeSalaryModal = document.getElementById('closeSalaryModal');
+    const salaryTab = document.getElementById('salaryTab');
+    const attendanceTab = document.getElementById('attendanceTab');
+    const salaryContent = document.getElementById('salaryContent');
+    const attendanceContent = document.getElementById('attendanceContent');
+
+    const openEditSalary = document.getElementById('openEditSalary');
+    const editSalaryModal = document.getElementById('editSalaryModal');
+    const closeModal = document.getElementById('closeModal');
+
+    detailLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        salaryModal.style.display = 'flex';
+        showSalaryTab();
+      });
+    });
+
+    openEditSalary.addEventListener('click', () => {
+    editSalaryModal.style.display = 'flex';
+    });
+
+    closeModal.addEventListener('click', () => {
+    editSalaryModal.style.display = 'none';
+    });
+
+    closeSalaryModal.addEventListener('click', function () {
+      salaryModal.style.display = 'none';
+    });
+
+    salaryTab.addEventListener('click', showSalaryTab);
+    attendanceTab.addEventListener('click', showAttendanceTab);
+
+    function showSalaryTab() {
+      salaryTab.classList.add('active');
+      attendanceTab.classList.remove('active');
+      salaryContent.style.display = 'block';
+      attendanceContent.style.display = 'none';
+    }
+
+    function showAttendanceTab() {
+      salaryTab.classList.remove('active');
+      attendanceTab.classList.add('active');
+      salaryContent.style.display = 'none';
+      attendanceContent.style.display = 'block';
+    }
+
+    openEditSalary.addEventListener('click', () => {
+      editSalaryModal.style.display = 'flex';
+    });
+
+    closeEditSalaryModal.addEventListener('click', () => {
+      editSalaryModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target === editSalaryModal) {
+        editSalaryModal.style.display = 'none';
+      }
+    });
+
+    
+    
+  </script>
+</body>
+</html>
