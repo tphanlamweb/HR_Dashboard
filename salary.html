@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payroll and Attendance Management</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h1 class="logo">HRD</h1>
+      <ul>
+        <li><span>👤</span> Employee</li>
+        <li class="active"><span>💰</span> Salary</li>
+        <li><span>🏢</span> Department</li>
+        <li><span>📊</span> Analytic</li>
+        <li><span>🔔</span> Notification</li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="search-bar">
+        <input type="text" placeholder="Search Employee by ID, name, department, position" />
+        <button>Search</button>
+      </div>
+
+      <div class="content">
+        <h2>Payroll and Attendance Management</h2>
+        <button class="edit-btn">✏️ Edit Salary</button>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Salary ID</th>
+              <th>Position</th>
+              <th>Department ID</th>
+              <th>Base salary</th>
+              <th>Bonus/Minus</th>
+              <th>Net salary</th>
+              <th>Specifically</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>00123</td>
+              <td>ThanhPhan</td>
+              <td>1122</td>
+              <td>Senior Data Analyst</td>
+              <td>0001</td>
+              <td>20.000.000</td>
+              <td>500.000</td>
+              <td>20.500.000</td>
+              <td><a href="#">Details</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="salaryModal">
+    <div class="modal-content">
+      <div class="modal-header">Payroll and Attendance Management</div>
+      <div class="modal-body">
+        <div class="modal-buttons">
+          <button class="active" id="salaryTab">View Salary History</button>
+          <button id="attendanceTab">View Attendance Data</button>
+        </div>
+
+        <div id="salaryContent">
+          <div class="salary-filter">
+            <span>Salary History by Month</span>
+            <select>
+              <option>04/2024</option>
+              <option>03/2024</option>
+              <option>02/2024</option>
+            </select>
+          </div>
+          <p><strong>Salary History by Month from PAYROLL</strong></p>
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Base Salary</th>
+                <th>Bonus/Minus</th>
+                <th>Deduction</th>
+                <th>Net Salary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12/2024</td>
+                <td>15.000.000</td>
+                <td>0</td>
+                <td>0</td>
+                <td>15.000.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="attendanceContent" style="display: none;">
+          <div class="salary-filter">
+            <span>Attendance by Month</span>
+            <select>
+              <option>04/2024</option>
+              <option>03/2024</option>
+              <option>02/2024</option>
+            </select>
+          </div>
+          <p><strong>Attendance Data</strong></p>
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Check-in</th>
+                <th>Check-out</th>
+                <th>Note</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2025-04-01</td>
+                <td>Work</td>
+                <td>08:00</td>
+                <td>17:00</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>2025-04-02</td>
+                <td>Licensed</td>
+                <td>-</td>
+                <td>-</td>
+                <td>Sick leave</td>
+              </tr>
+              <tr>
+                <td>2025-04-03</td>
+                <td>Work</td>
+                <td>08:15</td>
+                <td>17:00</td>
+                <td>Late check-in</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="closeModal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('salaryModal');
+    const closeBtn = document.getElementById('closeModal');
+    const detailLinks = document.querySelectorAll('a');
+    const salaryTab = document.getElementById('salaryTab');
+    const attendanceTab = document.getElementById('attendanceTab');
+    const salaryContent = document.getElementById('salaryContent');
+    const attendanceContent = document.getElementById('attendanceContent');
+
+    detailLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.style.display = 'flex';
+        showSalaryTab();
+      });
+    });
+
+    closeBtn.addEventListener('click', function () {
+      modal.style.display = 'none';
+    });
+
+    salaryTab.addEventListener('click', showSalaryTab);
+    attendanceTab.addEventListener('click', showAttendanceTab);
+
+    function showSalaryTab() {
+      salaryTab.classList.add('active');
+      attendanceTab.classList.remove('active');
+      salaryContent.style.display = 'block';
+      attendanceContent.style.display = 'none';
+    }
+
+    function showAttendanceTab() {
+      salaryTab.classList.remove('active');
+      attendanceTab.classList.add('active');
+      salaryContent.style.display = 'none';
+      attendanceContent.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

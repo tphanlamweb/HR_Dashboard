@@ -1,0 +1,233 @@
+/* Tổng thể */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fb;
+}
+
+.container {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #1a2c55;
+  color: white;
+  height: 100vh;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar li.active {
+  background-color: #4a90e2;
+  border-radius: 8px;
+  padding-left: 10px;
+}
+
+/* Main content */
+.main-content {
+  flex: 1;
+  padding: 30px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.search-bar button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #4a90e2;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table th, table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+table th {
+  background-color: #f0f2f5;
+}
+
+a {
+  color: #4a90e2;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.3);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 15px;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-header {
+  background: #4a90e2;
+  color: white;
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 10px 10px 0 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background-color: #eee;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-buttons button.active {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.salary-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.salary-filter select {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.modal-table th, .modal-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.modal-footer {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.modal-footer button {
+  padding: 8px 16px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Attendance Type Styling */
+.attendance-type {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  color: white;
+}
+
+.attendance-type.Work {
+  background-color: #4caf50;
+}
+
+.attendance-type.Licensed {
+  background-color: #2196f3;
+}
+
+.attendance-type.Late {
+  background-color: #ff9800;
+}
+
+.attendance-type.Absent {
+  background-color: #f44336;
+}
+
+.attendance-type.Overtime {
+  background-color: #9c27b0;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
