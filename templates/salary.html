@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payroll and Attendance Management</title>
+  {# Nhúng Font Awesome cho các icon #}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* Tổng thể */
+    body {
+        font-family: 'Segoe UI', sans-serif; /* Sử dụng font-family thống nhất */
+        margin: 0;
+        padding: 0;
+        background-color: #f5f8ff; /* Sử dụng màu nền thống nhất */
+        overflow-x: hidden; /* Ngăn cuộn ngang không mong muốn */
+    }
+
+    .container {
+        display: flex;
+        width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+        min-height: 100vh; /* Đảm bảo chiếm ít nhất toàn bộ chiều cao viewport */
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 120px; /* Giữ nguyên width 120px như các file khác */
+        background-color: #001f54; /* Giữ nguyên màu nền thống nhất */
+        color: white;
+        min-height: 100vh; /* Sử dụng min-height thay vì height */
+        padding-top: 20px; /* Giữ nguyên padding-top */
+        display: flex; /* Giữ nguyên display flex */
+        flex-direction: column; /* Giữ nguyên flex-direction column */
+        align-items: center; /* Giữ nguyên align-items center */
+        flex-shrink: 0; /* Ngăn sidebar bị co lại */
+    }
+
+    .sidebar .logo { /* Sử dụng selector cụ thể hơn */
+        font-size: 1.5rem; /* Giữ nguyên font-size thống nhất */
+        margin-bottom: 20px; /* Giữ nguyên margin-bottom */
+    }
+
+    .sidebar .menu { /* Thêm class menu cho nav */
+        width: 100%; /* Đảm bảo menu chiếm toàn bộ chiều rộng sidebar */
+    }
+
+    .sidebar .menu a { /* Sử dụng selector cụ thể hơn */
+        display: flex;
+        flex-direction: column;  /* Icon nằm trên chữ */
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        padding: 15px 0;
+        text-align: center;
+        text-decoration: none;
+        font-size: 14px;
+        gap: 5px;
+        width: 100%; /* Đảm bảo link chiếm toàn bộ chiều rộng của sidebar item */
+        transition: background-color 0.3s ease; /* Thêm transition cho hover */
+    }
+
+    .sidebar .menu a i { /* Sử dụng selector cụ thể hơn */
+        font-size: 20px;
+    }
+
+    .sidebar .menu a.active, /* Sử dụng selector cụ thể hơn */
+    .sidebar .menu a:hover {
+        border-radius: 8px; /* Giữ nguyên border-radius */
+    }
+    .sidebar .menu a.active_payrolls, /* Sử dụng selector cụ thể hơn */
+    .sidebar .menu a:hover {
+        background-color: #002b7a;
+        border-radius: 8px; /* Giữ nguyên border-radius */
+    }
+
+    /* Main content */
+    .main-content {
+        flex: 1;
+        padding: 20px; /* Giữ nguyên padding */
+        overflow-y: auto; /* Cho phép cuộn nếu nội dung quá dài */
+    }
+
+    .header { /* Giữ nguyên style header */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .search-group { /* Giữ nguyên style search-group */
+        display: flex;
+        gap: 10px;
+    }
+
+    .header input { /* Giữ nguyên style header input */
+        width: 800px; /* Có thể cần điều chỉnh width này cho responsive */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .search-bar button { /* Giữ nguyên style search-bar button */
+        padding: 10px 20px;
+        border: none;
+        background-color: #3182ce; /* Giữ nguyên màu nền thống nhất */
+        color: white;
+        border-radius: 5px; /* Giữ nguyên border-radius */
+        cursor: pointer;
+    }
+
+    .user-info { /* Giữ nguyên style user-info */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .user-info span { /* Giữ nguyên style user-info span */
+        font-weight: bold;
+    }
+
+    .user-info .avatar { /* Giữ nguyên style user-info avatar */
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: #ccc;
+    }
+
+
+    .payroll-section { /* Đã đổi tên class */
+        margin-top: 30px; /* Khoảng cách trên section bảng */
+    }
+
+    .section-header { /* Giữ nguyên style section-header */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+
+    /* Style cơ bản cho tất cả các nút có class "btn" */
+    .btn {
+        padding: 8px 15px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        display: inline-flex; /* Sử dụng flexbox để căn icon và text */
+        align-items: center;
+        gap: 5px; /* Khoảng cách giữa icon và text */
+        text-decoration: none; /* Loại bỏ gạch chân cho link nếu dùng <a> */
+        font-size: 14px;
+        transition: background-color 0.3s ease; /* Hiệu ứng hover */
+    }
+
+     /* Style cho nút Update trong modal */
+    .btn.update {
+      background-color: #007bff; /* Màu xanh dương */
+    }
+     .btn.update:hover {
+        background-color: #0056b3; /* Màu xanh đậm hơn khi hover */
+     }
+
+    /* Style cho nút nhỏ (sm) - nếu cần dùng lại */
+    .btn.btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin-right: 5px;
+    }
+
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    table th, table td {
+        padding: 12px; /* Giữ nguyên padding */
+        border-bottom: 1px solid #eee; /* Giữ nguyên border */
+        text-align: left; /* Căn trái cho text trong bảng */
+    }
+
+    table th {
+        background-color: #f0f4fa; /* Giữ nguyên màu nền header */
+        font-weight: bold;
+    }
+
+      /* Style cho hàng có thể click */
+    tbody tr.payroll-row { /* Sử dụng class cụ thể hơn */
+        cursor: pointer; /* Thay đổi con trỏ chuột để báo hiệu có thể click */
+    }
+    tbody tr.payroll-row:hover { /* Sử dụng class cụ thể hơn */
+        background-color: #f0f0f0; /* Đổi màu nền khi hover để dễ nhận biết */
+    }
+
+
+    /* Modal styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 100; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        padding: 20px; /* Thêm padding để modal không dính sát mép trên mobile */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        padding: 30px;
+        border-radius: 10px;
+        position: relative; /* Needed for absolute positioning of close button */
+        width: 700px; /* Adjusted width */
+        max-width: 95%; /* Thêm max-width để responsive tốt hơn */
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .close {
+        color: #aaa;
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: color 0.3s ease; /* Thêm transition cho hover */
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #333; /* Màu đậm hơn khi hover */
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .modal h2 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #333;
+    }
+
+    .modal-buttons { /* Style cho các nút tab trong modal */
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px; /* Giữ border-radius 5px */
+      background-color: #e0e0e0; /* Màu nền nhạt hơn */
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease, color 0.3s ease; /* Thêm transition */
+    }
+
+    .modal-buttons button.active {
+      background-color: #007bff; /* Màu xanh dương */
+      color: white;
+    }
+     .modal-buttons button:hover:not(.active) {
+         background-color: #d5d5d5; /* Màu nhạt hơn khi hover và không active */
+     }
+
+
+    .salary-filter { /* Giữ nguyên style salary-filter */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .salary-filter select { /* Giữ nguyên style salary-filter select */
+        padding: 6px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .modal-table { /* Giữ nguyên style modal-table */
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .modal-table th, .modal-table td { /* Giữ nguyên style modal-table th, td */
+        padding: 10px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+     .modal-table th {
+         background-color: #f0f4fa; /* Màu nền header thống nhất */
+     }
+
+
+    .modal-footer { /* Giữ nguyên style modal-footer */
+        text-align: right;
+        margin-top: 20px;
+    }
+
+    .modal-footer button { /* Giữ nguyên style modal-footer button */
+        padding: 8px 16px;
+        background-color: #007bff; /* Màu xanh dương */
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+         transition: background-color 0.3s ease; /* Thêm transition */
+    }
+     .modal-footer button:hover {
+         background-color: #0056b3; /* Màu xanh đậm hơn khi hover */
+     }
+
+
+    /* Attendance Type Styling - Cần điều chỉnh nếu Status không có trong DB */
+    /* Tạm thời giữ lại style nhưng sẽ không hiển thị Status nếu cột không có */
+    .attendance-type { /* Giữ nguyên style attendance-type */
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: white;
+        display: inline-block; /* Đảm bảo span có kích thước */
+    }
+
+    .attendance-type.Work { background-color: #4caf50; }
+    .attendance-type.Licensed { background-color: #2196f3; }
+    .attendance-type.Late { background-color: #ff9800; }
+    .attendance-type.Absent { background-color: #f44336; }
+    .attendance-type.Overtime { background-color: #9c27b0; }
+
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .header input {
+            width: 60%;
+        }
+         .search-bar {
+             flex-direction: column;
+             gap: 10px;
+         }
+          .search-bar input, .search-bar button {
+              width: 100%;
+          }
+
+        .modal-content {
+            padding: 20px;
+        }
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        .modal-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+         .modal-buttons button {
+             width: 100%;
+         }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <h1 class="logo">HRD</h1>
+      {# Sử dụng url_for cho các liên kết Sidebar #}
+      <nav class="menu">
+        <a href="{{ url_for('get_employees') }}"><i class="fa-solid fa-users"></i><span>Employee</span></a>
+        <a href="{{ url_for('get_payrolls') }}" class="active_payrolls"><i class="fa-solid fa-money-check-dollar"></i><span>Salary</span></a>
+        <a href="{{ url_for('report_page') }}"><i class="fa-solid fa-chart-line"></i><span>Analytic</span></a>
+        <a href="{{ url_for('notifications') }}"><i class="fa-solid fa-bell"></i><span>Notification</span></a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <header class="header">
+        <div class="search-bar"> {# Added search-bar div #}
+            <input type="text" placeholder="Search Employee by ID, name, department, position" />
+            <button class="search-bar button">Search</button> {# Added search-bar class to button #}
+        </div>
+        <div class="user-info">
+          <span>Ms.Thuy</span> {# Thay thế bằng thông tin người dùng động #}
+          <div class="avatar"></div> {# Thay thế bằng avatar/ảnh người dùng động #}
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="section-header"> 
+            <h2>Payroll and Attendance Management</h2>
+        </div>
+
+
+        <table>
+          <thead>
+            {# Tiêu đề cột để khớp với dữ liệu có sẵn từ route get_payrolls #}
+            <tr>
+              <th>Employee ID</th>
+              <th>Full Name</th>
+              <th>Salary ID</th>
+              <th>Salary Month</th>
+              <th>Base Salary</th>
+              <th>Bonus</th>
+              <th>Deductions</th>
+              <th>Net Salary</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payroll_entry in luong_nv %}
+             <tr class="payroll-row"
+                 data-employee-id="{{ payroll_entry.EmployeeID }}"
+                 data-full-name="{{ payroll_entry.FullName }}"
+                 data-salary-id="{{ payroll_entry.SalaryID }}"
+                 {# Định dạng ngày tháng lương sangYYYY-MM-DD cho input type="date" #}
+                 data-salary-month="{{ payroll_entry.SalaryMonth.strftime('%Y-%m-%d') if payroll_entry.SalaryMonth else '' }}"
+                 data-base-salary="{{ payroll_entry.BaseSalary }}"
+                 data-bonus="{{ payroll_entry.Bonus }}"
+                 data-deductions="{{ payroll_entry.Deductions }}"
+                 data-net-salary="{{ payroll_entry.NetSalary }}">
+                <td>{{ payroll_entry.EmployeeID }}</td>
+                <td>{{ payroll_entry.FullName }}</td>
+                <td>{{ payroll_entry.SalaryID }}</td>
+                 {# Hiển thị tháng lương, định dạng lại cho đẹp trên bảng #}
+                 <td>{{ payroll_entry.SalaryMonth.strftime('%m/%Y') if payroll_entry.SalaryMonth else 'N/A' }}</td>
+                <td>{{ payroll_entry.BaseSalary }}</td>
+                <td>{{ payroll_entry.Bonus }}</td>
+                <td>{{ payroll_entry.Deductions }}</td>
+                <td>{{ payroll_entry.NetSalary }}</td>
+                {# *** Đã XÓA: Nội dung cột Specifically *** #}
+                {# <td><a href="#">Details</a></td> #}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  {# Modal for Payroll and Attendance Details #}
+  <div class="modal" id="detailsModal"> {# *** Đã ĐỔI ID modal thành detailsModal *** #}
+    <div class="modal-content">
+      {# Sử dụng class close cho nút đóng #}
+      <span class="close">&times;</span>
+      <h2>Details for <span id="modal-employee-name"></span></h2> {# Tiêu đề động #}
+      <div class="modal-body">
+        <div class="modal-buttons">
+          <button class="active" id="salaryHistoryTab">View Salary History</button> {# *** Đã ĐỔI ID tab *** #}
+          <button id="attendanceDataTab">View Attendance Data</button> {# *** Đã ĐỔI ID tab *** #}
+        </div>
+
+        {# Nội dung tab Lịch sử Lương #}
+        <div id="salaryHistoryContent"> {# *** Đã ĐỔI ID content *** #}
+          <div class="salary-filter">
+            <span>Salary History by Month</span>
+            {# Selector tháng lương - sẽ điền động bằng JS #}
+            <select id="salaryMonthSelect"> {# *** Đã THÊM ID cho select *** #}
+              {# Options sẽ được thêm bằng JS #}
+            </select>
+          </div>
+          <p><strong>Salary History by Month from PAYROLL</strong></p>
+          <table class="modal-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th>Base Salary</th>
+                <th>Bonus</th> {# Đã đổi tên cột #}
+                <th>Deduction</th> {# Đã đổi tên cột #}
+                <th>Net Salary</th>
+                 <th>Salary ID</th> {# Có thể thêm Salary ID #}
+              </tr>
+            </thead>
+            <tbody id="salaryHistoryTableBody"> {# *** Đã THÊM ID cho tbody để điền dữ liệu động *** #}
+              {# Dữ liệu sẽ được điền động bằng JS #}
+            </tbody>
+          </table>
+        </div>
+
+        {# Nội dung tab Dữ liệu Chấm công #}
+        <div id="attendanceDataContent" style="display: none;"> {# *** Đã ĐỔI ID content *** #}
+          <div class="salary-filter">
+            <span>Attendance by Month</span>
+             {# Selector tháng chấm công - sẽ điền động bằng JS #}
+            <select id="attendanceMonthSelect"> {# *** Đã THÊM ID cho select *** #}
+              {# Options sẽ được thêm bằng JS #}
+            </select>
+          </div>
+          <p><strong>Attendance Data</strong></p>
+          <table class="modal-table">
+            <thead>
+              {# *** Đã CHỈNH SỬA: Tiêu đề cột để khớp với dữ liệu có sẵn trong DB Attendance *** #}
+              <tr>
+                <th>Attendance ID</th> {# Thêm Attendance ID #}
+                <th>Employee ID</th> {# Thêm Employee ID #}
+                <th>Month</th> {# Đã đổi tên cột Date thành Month #}
+                <th>Work Days</th>
+                <th>Absent Days</th>
+                <th>Leave Days</th>
+                 {# *** Đã XÓA: Các cột không có trong DB Attendance *** #}
+                 {# <th>Status</th> #}
+                 {# <th>Check-in</th> #}
+                 {# <th>Check-out</th> #}
+                 {# <th>Note</th> #}
+              </tr>
+            </thead>
+            <tbody id="attendanceDataTableBody"> {# *** Đã THÊM ID cho tbody để điền dữ liệu động *** #}
+              {# Dữ liệu sẽ được điền động bằng JS #}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        {# *** Đã ĐỔI ID nút đóng modal *** #}
+        <button class="close-modal-btn">Close</button> {# Sử dụng class hoặc ID mới #}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Biến toàn cục để lưu trữ toàn bộ dữ liệu lương và chấm công
+    // Dữ liệu này được Flask truyền sang thông qua script tag ẩn
+    let allSalariesData = [];
+    let allAttendanceData = [];
+
+    // Open Modal function
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    // Close Modal function (dùng cho mọi modal)
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Gắn sự kiện click cho mọi nút đóng modal (class="close")
+    document.querySelectorAll('.modal .close').forEach(button => {
+        button.addEventListener('click', function() {
+            // Tìm modal cha gần nhất và đóng nó
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+
+     // Gắn sự kiện click cho nút đóng modal ở footer
+    document.querySelectorAll('.modal .close-modal-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+
+
+    // Đóng modal khi click ra ngoài nội dung modal
+    window.addEventListener('click', function(event) {
+        document.querySelectorAll('.modal').forEach(modal => {
+            if (event.target === modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+
+
+    // *** Đã CHỈNH SỬA: Hàm để hiển thị Lịch sử Lương từ dữ liệu đã tải ***
+    function displaySalaryHistory(employeeId, month = null) {
+        console.log(`Displaying salary history for employee ${employeeId}, month ${month}`); // Debug log
+        const salaryTableBody = document.getElementById('salaryHistoryTableBody');
+        salaryTableBody.innerHTML = ''; // Xóa nội dung cũ
+
+        // Lọc dữ liệu lương theo EmployeeID
+        const employeeSalaries = allSalariesData.filter(salary => salary.EmployeeID == employeeId);
+        console.log(`Found ${employeeSalaries.length} salary entries for employee ${employeeId}`); // Debug log
+
+        if (employeeSalaries.length === 0) {
+            salaryTableBody.innerHTML = '<tr><td colspan="6">No salary history found for this employee.</td></tr>';
+            return;
+        }
+
+        // Lọc thêm theo tháng nếu có
+        const filteredSalaries = month ?
+            employeeSalaries.filter(salary => salary.SalaryMonth && salary.SalaryMonth.startsWith(month)) :
+            employeeSalaries;
+         console.log(`Found ${filteredSalaries.length} filtered salary entries for month ${month}`); // Debug log
+
+
+        if (filteredSalaries.length === 0) {
+             salaryTableBody.innerHTML = '<tr><td colspan="6">No salary history found for the selected month.</td></tr>';
+             return;
+        }
+
+        // Sắp xếp theo tháng giảm dần (tháng mới nhất lên đầu)
+        filteredSalaries.sort((a, b) => {
+            if (a.SalaryMonth < b.SalaryMonth) return 1;
+            if (a.SalaryMonth > b.SalaryMonth) return -1;
+            return 0;
+        });
+
+
+        filteredSalaries.forEach(salary => {
+             // Định dạng lại tháng lương cho hiển thị (MM/YYYY)
+             let displayMonth = 'N/A';
+             if (salary.SalaryMonth) {
+                 try {
+                     // SalaryMonth is inYYYY-MM-DD format from data attribute
+                     const [year, month, day] = salary.SalaryMonth.split('-');
+                     displayMonth = `${month}/${year}`;
+                 } catch (e) {
+                     displayMonth = salary.SalaryMonth; // Keep as is if format is wrong
+                 }
+             }
+
+            const row = `
+                <tr>
+                    <td>${displayMonth}</td>
+                    <td>${salary.BaseSalary || '0'}</td>
+                    <td>${salary.Bonus || '0'}</td>
+                    <td>${salary.Deductions || '0'}</td>
+                    <td>${salary.NetSalary || '0'}</td>
+                    <td>${salary.SalaryID || 'N/A'}</td>
+                </tr>
+            `;
+            salaryTableBody.innerHTML += row;
+        });
+    }
+
+     // *** Đã CHỈNH SỬA: Hàm để hiển thị Dữ liệu Chấm công từ dữ liệu đã tải ***
+     // Chỉ hiển thị các cột có trong DB Attendance: AttendanceID, EmployeeID, AttendanceMon, WorkDays, AbsentDays, LeaveDays
+    function displayAttendanceData(employeeId, month = null) {
+        console.log(`Displaying attendance data for employee ${employeeId}, month ${month}`); // Debug log
+        const attendanceTableBody = document.getElementById('attendanceDataTableBody');
+        attendanceTableBody.innerHTML = ''; // Xóa nội dung cũ
+
+        // Lọc dữ liệu chấm công theo EmployeeID
+        const employeeAttendance = allAttendanceData.filter(attendance => attendance.EmployeeID == employeeId);
+        console.log(`Found ${employeeAttendance.length} attendance entries for employee ${employeeId}`); // Debug log
+
+
+        if (employeeAttendance.length === 0) {
+            attendanceTableBody.innerHTML = '<tr><td colspan="6">No attendance data found for this employee.</td></tr>'; {# Cập nhật colspan #}
+            return;
+        }
+
+         // Lọc thêm theo tháng nếu có
+        const filteredAttendance = month ?
+            employeeAttendance.filter(attendance => attendance.AttendanceMon && attendance.AttendanceMon.startsWith(month)) :
+            employeeAttendance;
+        console.log(`Found ${filteredAttendance.length} filtered attendance entries for month ${month}`); // Debug log
+
+
+        if (filteredAttendance.length === 0) {
+             attendanceTableBody.innerHTML = '<tr><td colspan="6">No attendance data found for the selected month.</td></tr>'; {# Cập nhật colspan #}
+             return;
+        }
+
+        // Sắp xếp theo tháng giảm dần (tháng mới nhất lên đầu)
+        filteredAttendance.sort((a, b) => {
+             if (a.AttendanceMon < b.AttendanceMon) return 1;
+             if (a.AttendanceMon > b.AttendanceMon) return -1;
+             return 0;
+        });
+
+
+        filteredAttendance.forEach(attendance => {
+             // Định dạng lại tháng chấm công cho hiển thị (MM/YYYY)
+             let displayMonth = 'N/A';
+             if (attendance.AttendanceMon) {
+                 try {
+                     // AttendanceMon is inYYYY-MM-DD format from data attribute
+                     const [year, month, day] = attendance.AttendanceMon.split('-');
+                     displayMonth = `${month}/${year}`;
+                 } catch (e) {
+                     displayMonth = attendance.AttendanceMon; // Keep as is if format is wrong
+                 }
+             }
+
+
+            const row = `
+                <tr>
+                    <td>${attendance.AttendanceID || 'N/A'}</td> {# Hiển thị Attendance ID #}
+                    <td>${attendance.EmployeeID || 'N/A'}</td> {# Hiển thị Employee ID #}
+                    <td>${displayMonth}</td> {# Hiển thị tháng đã định dạng #}
+                    <td>${attendance.WorkDays || '0'}</td>
+                    <td>${attendance.AbsentDays || '0'}</td>
+                    <td>${attendance.LeaveDays || '0'}</td>
+                    {# *** Đã XÓA: Các ô dữ liệu không có trong DB Attendance *** #}
+                    {# <td><span class="attendance-type ${statusClass}">${attendance.Status || 'N/A'}</span></td> #}
+                    {# <td>${checkIn}</td> #}
+                    {# <td>${checkOut}</td> #}
+                    {# <td>${note}</td> #}
+                </tr>
+            `;
+            attendanceTableBody.innerHTML += row;
+        });
+    }
+
+     // *** Đã CHỈNH SỬA: Hàm để điền các tùy chọn tháng vào selector từ dữ liệu đã tải ***
+     function populateMonthSelectors(employeeId) {
+         console.log(`Populating month selectors for employee ${employeeId}`); // Debug log
+         const salaryMonthSelect = document.getElementById('salaryMonthSelect');
+         const attendanceMonthSelect = document.getElementById('attendanceMonthSelect');
+
+         // Xóa các tùy chọn cũ
+         salaryMonthSelect.innerHTML = '<option value="">Select Month</option>';
+         attendanceMonthSelect.innerHTML = '<option value="">Select Month</option>';
+
+         // Lấy các tháng duy nhất từ dữ liệu lương và chấm công của nhân viên
+         const employeeSalaries = allSalariesData.filter(salary => salary.EmployeeID == employeeId);
+         const employeeAttendance = allAttendanceData.filter(attendance => attendance.EmployeeID == employeeId);
+
+         // ExtractYYYY-MM format from dates
+         const salaryMonths = new Set(employeeSalaries.map(s => s.SalaryMonth ? s.SalaryMonth.substring(0, 7) : null).filter(month => month));
+         const attendanceMonths = new Set(employeeAttendance.map(a => a.AttendanceMon ? a.AttendanceMon.substring(0, 7) : null).filter(month => month));
+
+         // Kết hợp các tháng duy nhất và sắp xếp giảm dần
+         const allMonths = Array.from(new Set([...salaryMonths, ...attendanceMonths])).sort().reverse();
+         console.log(`Available months: ${allMonths.join(', ')}`); // Debug log
+
+
+         allMonths.forEach(month => {
+             const option = `<option value="${month}">${month}</option>`; // Giá trị làYYYY-MM
+             salaryMonthSelect.innerHTML += option;
+             attendanceMonthSelect.innerHTML += option;
+         });
+     }
+
+
+    // *** Đã CHỈNH SỬA: Gắn sự kiện click cho mỗi hàng có class="payroll-row" ***
+    // Khi click vào hàng, mở modal chi tiết và hiển thị dữ liệu từ các biến toàn cục
+    document.querySelectorAll("tbody tr.payroll-row").forEach(row => {
+      row.addEventListener("click", function (event) {
+        // Lấy Employee ID từ data attribute của hàng
+        const employeeId = this.getAttribute('data-employee-id');
+        const fullName = this.getAttribute('data-full-name');
+        console.log(`Row clicked for Employee ID: ${employeeId}, Name: ${fullName}`); // Debug log
+
+
+        // Điền tên nhân viên vào tiêu đề modal
+        document.getElementById('modal-employee-name').innerText = fullName || 'N/A';
+
+        // Mở modal chi tiết
+        openModal('detailsModal');
+
+        // *** Đã CHỈNH SỬA: Sử dụng các hàm hiển thị dữ liệu từ biến toàn cục ***
+
+        // Tải danh sách các tháng có dữ liệu cho selector
+        populateMonthSelectors(employeeId);
+
+        // Lấy tháng từ hàng được click (định dạngYYYY-MM-DD)
+        const salaryMonthFull = this.getAttribute('data-salary-month');
+        let defaultMonth = null;
+        if (salaryMonthFull) {
+            defaultMonth = salaryMonthFull.substring(0, 7); // LấyYYYY-MM
+        }
+        console.log(`Default month from row: ${defaultMonth}`); // Debug log
+
+
+        // *** Đã CHỈNH SỬA: Gắn sự kiện cho các tab button trong modal ***
+        const salaryHistoryTab = document.getElementById('salaryHistoryTab');
+        const attendanceDataTab = document.getElementById('attendanceDataTab');
+        const salaryHistoryContent = document.getElementById('salaryHistoryContent');
+        const attendanceDataContent = document.getElementById('attendanceDataContent');
+
+        // Gỡ bỏ các event listener cũ trước khi gán lại để tránh lặp
+        // (Cần làm điều này vì event listener được gắn lại mỗi khi modal mở)
+        // Sử dụng cloneNode(true) để tạo bản sao và thay thế, gỡ bỏ tất cả listeners cũ
+        const oldSalaryTab = salaryHistoryTab;
+        const newSalaryTab = oldSalaryTab.cloneNode(true);
+        oldSalaryTab.parentNode.replaceChild(newSalaryTab, oldSalaryTab);
+        const oldAttendanceTab = attendanceDataTab;
+        const newAttendanceTab = oldAttendanceTab.cloneNode(true);
+        oldAttendanceTab.parentNode.replaceChild(newAttendanceTab, oldAttendanceTab);
+
+        // Cập nhật lại tham chiếu đến các nút tab mới
+        const currentSalaryHistoryTab = document.getElementById('salaryHistoryTab');
+        const currentAttendanceDataTab = document.getElementById('attendanceDataTab');
+
+
+        currentSalaryHistoryTab.addEventListener('click', function() {
+             console.log('Salary History Tab clicked'); // Debug log
+             currentSalaryHistoryTab.classList.add('active');
+             currentAttendanceDataTab.classList.remove('active');
+             salaryHistoryContent.style.display = 'block';
+             attendanceDataContent.style.display = 'none';
+             // Hiển thị dữ liệu lịch sử lương cho tháng đang chọn
+             const selectedMonth = document.getElementById('salaryMonthSelect').value;
+             displaySalaryHistory(employeeId, selectedMonth);
+        });
+
+        currentAttendanceDataTab.addEventListener('click', function() {
+             console.log('Attendance Data Tab clicked'); // Debug log
+             currentSalaryHistoryTab.classList.remove('active');
+             currentAttendanceDataTab.classList.add('active');
+             salaryHistoryContent.style.display = 'none';
+             attendanceDataContent.style.display = 'block';
+             // Hiển thị dữ liệu chấm công cho tháng đang chọn
+             const selectedMonth = document.getElementById('attendanceMonthSelect').value;
+             displayAttendanceData(employeeId, selectedMonth);
+        });
+
+         // *** Đã CHỈNH SỬA: Gắn sự kiện thay đổi cho selector tháng lương ***
+         const salaryMonthSelect = document.getElementById('salaryMonthSelect');
+         // Gỡ bỏ event listener cũ trước khi gán lại bằng cách clone và thay thế
+         const oldSalaryMonthSelect = salaryMonthSelect;
+         const newSalaryMonthSelect = oldSalaryMonthSelect.cloneNode(true);
+         oldSalaryMonthSelect.parentNode.replaceChild(newSalaryMonthSelect, oldSalaryMonthSelect);
+         const currentSalaryMonthSelect = document.getElementById('salaryMonthSelect'); // Cập nhật tham chiếu
+
+        currentSalaryMonthSelect.addEventListener('change', function() {
+            console.log(`Salary Month selected: ${this.value}`); // Debug log
+            const selectedMonth = this.value;
+            displaySalaryHistory(employeeId, selectedMonth);
+        });
+
+         // *** Đã CHỈNH SỬA: Gắn sự kiện thay đổi cho selector tháng chấm công ***
+         const attendanceMonthSelect = document.getElementById('attendanceMonthSelect');
+         // Gỡ bỏ event listener cũ trước khi gán lại bằng cách clone và thay thế
+         const oldAttendanceMonthSelect = attendanceMonthSelect;
+         const newAttendanceMonthSelect = oldAttendanceMonthSelect.cloneNode(true);
+         oldAttendanceMonthSelect.parentNode.replaceChild(newAttendanceMonthSelect, oldAttendanceMonthSelect);
+         const currentAttendanceMonthSelect = document.getElementById('attendanceMonthSelect'); // Cập nhật tham chiếu
+
+        currentAttendanceMonthSelect.addEventListener('change', function() {
+            console.log(`Attendance Month selected: ${this.value}`); // Debug log
+            const selectedMonth = this.value;
+            displayAttendanceData(employeeId, selectedMonth);
+        });
+
+
+        // Đảm bảo tab Lịch sử Lương hiển thị mặc định khi modal mở
+        // Cần gọi lại hàm click() trên tab button mới để kích hoạt hiển thị dữ liệu ban đầu
+        currentSalaryHistoryTab.click();
+
+
+      });
+    });
+
+    // *** Đã THÊM: Đoạn script để lấy dữ liệu toàn bộ lương và chấm công từ Flask khi trang tải ***
+    // Dữ liệu này được Flask render và JavaScript sẽ đọc nó khi trang tải
+    document.addEventListener('DOMContentLoaded', function() {
+         console.log('DOM fully loaded and parsed'); // Debug log
+
+         // Lấy dữ liệu từ các script tag ẩn (được Flask thêm vào)
+         const allSalariesScript = document.getElementById('all-salaries-data');
+         if (allSalariesScript) {
+             try {
+                 // Kiểm tra nội dung trước khi parse
+                 console.log('Raw all_salaries data:', allSalariesScript.textContent.substring(0, 500) + '...'); // Log vài ký tự đầu
+                 allSalariesData = JSON.parse(allSalariesScript.textContent);
+                 console.log(`Loaded ${allSalariesData.length} historical salary entries.`);
+                 console.log('allSalariesData sample:', allSalariesData.slice(0, 5)); // Log sample data
+             } catch (e) {
+                 console.error('Error parsing all_salaries data:', e);
+                 allSalariesData = []; // Đảm bảo biến là mảng rỗng nếu có lỗi
+             }
+         } else {
+             console.warn('all-salaries-data script tag not found.');
+             allSalariesData = []; // Đảm bảo biến là mảng rỗng
+         }
+
+
+         const allAttendanceScript = document.getElementById('all-attendance-data');
+         if (allAttendanceScript) {
+             try {
+                 // Kiểm tra nội dung trước khi parse
+                 console.log('Raw all_attendance data:', allAttendanceScript.textContent.substring(0, 500) + '...'); // Log vài ký tự đầu
+                 allAttendanceData = JSON.parse(allAttendanceScript.textContent);
+                 console.log(`Loaded ${allAttendanceData.length} attendance entries.`);
+                 console.log('allAttendanceData sample:', allAttendanceData.slice(0, 5)); // Log sample data
+             } catch (e) {
+                 console.error('Error parsing all_attendance data:', e);
+                 allAttendanceData = []; // Đảm bảo biến là mảng rỗng nếu có lỗi
+             }
+         } else {
+             console.warn('all-attendance-data script tag not found.');
+             allAttendanceData = []; // Đảm bảo biến là mảng rỗng
+         }
+
+         // Sau khi dữ liệu được tải, không cần fetch API nữa khi click hàng
+         // Logic hiển thị sẽ dùng dữ liệu trong biến allSalariesData và allAttendanceData
+    });
+
+
+  </script>
+
+  {# *** Đã THÊM: Các script tag ẩn để truyền dữ liệu JSON từ Flask sang JavaScript *** #}
+  {# Dữ liệu này được Flask render và JavaScript sẽ đọc nó khi trang tải #}
+  <script id="all-salaries-data" type="application/json">
+    {{ all_salaries | tojson }}
+  </script>
+
+  <script id="all-attendance-data" type="application/json">
+    {{ all_attendance | tojson }}
+  </script>
+
+</body>
+</html>

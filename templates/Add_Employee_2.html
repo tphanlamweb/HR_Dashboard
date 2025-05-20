@@ -4,114 +4,141 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Employee List</title>
-  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
-    * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  body {
-    background: #f5f8ff;
-  }
-  
-  .container {
-    display: flex;
-  }
-  
-  .sidebar {
-    width: 120px;
-    background: #001f54;
-    color: #fff;
-    display: flex;
-    height: 100vh;
 
-    flex-direction: column;
-    align-items: center;
-    padding-top: 20px;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-  
-  .menu a {
-    display: flex;
-    flex-direction: column;  /* Icon nằm trên chữ */
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    padding: 15px 0;
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    gap: 5px;
-  }
-  
-  .menu a i {
-    font-size: 20px;
-  }
-  
-  .menu a.active,
-  .menu a:hover {
-    background-color: #002b7a;
-    border-radius: 8px;
-  }
-  
+    /* Tổng thể */
+    body {
+        font-family: 'Segoe UI', sans-serif; /* Sử dụng font-family thống nhất */
+        margin: 0;
+        padding: 0;
+        background-color: #f5f8ff; /* Sử dụng màu nền thống nhất */
+        overflow-x: hidden; /* Ngăn cuộn ngang không mong muốn */
+    }
+
+    .container {
+        display: flex;
+        width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng */
+        min-height: 100vh; /* Đảm bảo chiếm ít nhất toàn bộ chiều cao viewport */
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 120px; /* Giữ nguyên width 120px như các file khác */
+        background-color: #001f54; /* Giữ nguyên màu nền thống nhất */
+        color: white;
+        min-height: 100vh; /* Sử dụng min-height thay vì height */
+        padding-top: 20px;
+        display: flex; /* Giữ nguyên display flex */
+        flex-direction: column; /* Giữ nguyên flex-direction column */
+        align-items: center; /* Giữ nguyên align-items center */
+        flex-shrink: 0; /* Ngăn sidebar bị co lại */
+    }
+
+    .sidebar .logo { /* Sử dụng selector cụ thể hơn */
+        font-size: 1.5rem; /* Giữ nguyên font-size thống nhất */
+        margin-bottom: 20px; /* Giữ nguyên margin-bottom */
+    }
+
+    .sidebar .menu { /* Thêm class menu cho nav */
+        width: 100%; /* Đảm bảo menu chiếm toàn bộ chiều rộng sidebar */
+    }
+
+    .sidebar .menu a { /* Sử dụng selector cụ thể hơn */
+        display: flex;
+        flex-direction: column;  /* Icon nằm trên chữ */
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        padding: 15px 0;
+        text-align: center;
+        text-decoration: none;
+        font-size: 14px;
+        gap: 5px;
+        width: 100%; /* Đảm bảo link chiếm toàn bộ chiều rộng của sidebar item */
+        transition: background-color 0.3s ease; /* Thêm transition cho hover */
+    }
+
+    .sidebar .menu a i { /* Sử dụng selector cụ thể hơn */
+        font-size: 20px;
+    }
+
+
+    .sidebar .menu a.active, /* Sử dụng selector cụ thể hơn */
+    .sidebar .menu a:hover {
+        background-color: #002b7a;
+        border-radius: 8px; /* Giữ nguyên border-radius */
+    }
+
+/*Main Content*/
+
   .main-content {
     flex: 1;
     padding: 20px;
+    overflow-y: auto; 
   }
-  
+
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 20px; 
   }
-  
+
   .header input {
     width: 800px;
     padding: 10px;
     border: 1px solid #ccc;
-  
+
     border-radius: 5px;
   }
-  
-  .search-btn {
+
+ .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-bar button {
     padding: 10px 20px;
+    border: none;
     background-color: #3182ce;
     color: white;
-    border: none;
     border-radius: 5px;
-  }
-  
+    cursor: pointer;
+}
+
+
   .user-info {
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  
+
   .user-info .avatar {
     width: 35px;
     height: 35px;
     border-radius: 50%;
     background-color: #ccc;
   }
-  
+
   .employee-section h2 {
     margin-top: 30px;
     margin-bottom: 20px;
   }
-  
+
   .actions {
     margin-bottom: 20px;
   }
-  
+
   .btn {
     padding: 8px 15px;
     margin-right: 10px;
@@ -119,16 +146,53 @@
     border-radius: 5px;
     color: white;
     cursor: pointer;
+    display: inline-flex; 
+    align-items: center;
+    gap: 5px; 
+    text-decoration: none; 
+    font-size: 14px;
+    transition: background-color 0.3s ease; 
   }
-  
-  .add {
+
+  .btn.add {
     background-color: #3182ce;
   }
-  
-  .update {
+  .btn.add:hover {
+     background-color: #2563eb; 
+  }
+
+
+  .btn.update {
     background-color: #4a90e2;
   }
-  
+   .btn.update:hover {
+      background-color: #3b82f6; 
+   }
+
+
+  .btn.btn-danger { 
+    background-color: #dc3545; 
+    color: white; 
+    border: none; 
+  }
+   .btn.btn-danger:hover {
+      background-color: #c82333; 
+   }
+
+   .btn.btn-primary {
+      background-color: #007bff;
+   }
+    .btn.btn-primary:hover {
+       background-color: #0056b3; 
+    }
+
+
+  .btn.btn-sm {
+      padding: 5px 10px; 
+      font-size: 12px; 
+  }
+
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -137,17 +201,26 @@
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0,0,0,0.05);
   }
-  
+
   th, td {
     padding: 12px 15px;
     text-align: left;
     border-bottom: 1px solid #eee;
   }
-  
+
   th {
     background-color: #f0f4fa;
     font-weight: bold;
   }
+
+  tbody tr {
+      cursor: pointer; 
+  }
+  tbody tr:hover {
+      background-color: #f0f0f0; 
+  }
+
+
   .modal {
     display: none;
     position: fixed;
@@ -158,18 +231,27 @@
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.4);
+    justify-content: center; 
+    align-items: center; 
+    padding: 20px; 
   }
-  
+
   .modal-content {
     background-color: #fff;
-    margin: 5% auto;
     padding: 30px;
     border-radius: 10px;
     width: 700px;
+    max-width: 95%; 
     position: relative;
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
   }
-  
+
+  .btn.delete {
+  background-color: #e53e3e; 
+  cursor: pointer;
+  color: white;
+}
+
   .close {
     position: absolute;
     top: 15px;
@@ -179,93 +261,158 @@
     color: #333;
     cursor: pointer;
   }
-  
+
   .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
   }
-  
+
   .form-grid label {
     display: flex;
     flex-direction: column;
     font-weight: 500;
     font-size: 14px;
   }
- 
-  .form-grid input {
+
+  .form-grid input, .form-grid select {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 6px;
     margin-top: 5px;
     background-color: #f0f4fa;
+    width: 100%;
   }
-  
-  .form-grid .btn.add {
-    padding: 8px;              
-    font-size: 14px;          
-    height: auto;               
-    align-self: end;          
+
+  .form-grid input[readonly] {
+      background-color: #e9ecef; 
+      cursor: not-allowed; 
   }
+
+
+  .form-grid .btn {
+      padding: 8px 15px;
+      font-size: 14px;
+      height: auto;
+      margin-top: 10px;
+      margin-right: 0; 
+      width: auto;
+  }
+   .form-grid .btn:not(:last-child) {
+       margin-right: 10px; 
+   }
+
+   .form-actions {
+       grid-column: span 2; 
+       display: flex;
+       justify-content: flex-end; 
+       gap: 10px; 
+       margin-top: 10px; 
+   }
+
+
+  @media (max-width: 768px) {
+      .header input {
+          width: 60%;
+      }
+      .form-grid {
+          grid-template-columns: 1fr;
+      }
+      .form-grid .btn {
+          width: 100%; 
+          margin-right: 0;
+          margin-bottom: 10px; 
+      }
+       .form-grid .btn:not(:last-child) {
+           margin-right: 0; 
+       }
+       .form-actions {
+           flex-direction: column; 
+           gap: 0; 
+       }
+        .form-actions .btn {
+            margin-right: 0; 
+            margin-bottom: 10px; 
+        }
+         .form-actions .btn:last-child {
+             margin-bottom: 0;
+         }
+
+      .actions .btn {
+           width: auto;
+           margin-bottom: 10px;
+      }
+  }
+
   </style>
 
 </head>
 <body>
   <div class="container">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="logo">HRD</div>
       <nav class="menu">
-        <a href="#" class="active"><i class="fa-solid fa-users"></i><span>Employee</span></a>
-        <a href="#"><i class="fa-solid fa-money-check-dollar"></i><span>Salary</span></a>
-        <a href="#"><i class="fa-solid fa-building"></i><span>Department</span></a>
-        <a href="#"><i class="fa-solid fa-chart-line"></i><span>Analytic</span></a>
-        <a href="#"><i class="fa-solid fa-bell"></i><span>Notification</span></a>
+        <a href="{{ url_for('get_employees') }}" class="active"><i class="fa-solid fa-users"></i><span>Employee</span></a>
+        <a href="{{ url_for('get_payrolls') }}"><i class="fa-solid fa-money-check-dollar"></i><span>Salary</span></a>
+        <a href="{{ url_for('report_page') }}"><i class="fa-solid fa-chart-line"></i><span>Analytic</span></a> 
+        <a href="{{ url_for('notifications') }}"><i class="fa-solid fa-bell"></i><span>Notification</span></a> 
       </nav>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
-      <header class="header">
-        <input type="text" placeholder="Search Employee by ID, name, department, position" />
-        <button class="search-btn">Search</button>
-        <div class="user-info">
-          <span>Ms.Thuy</span>
-          <div class="avatar"></div>
+      <header class="header-bar"></header>
+        <div class="search-bar">
+          <input type="text" placeholder="Search Employee by ID, name, department, position" />
+          <button>Search</button>
         </div>
-      </header>
 
+          <div class="user-info">
+            <span>Ms.Thuy</span> 
+            <div class="avatar"></div> 
+          </div>
+      </header>
+    
       <section class="employee-section">
         <h2>Employee Lists</h2>
         <div class="actions">
-          <button class="btn add" onclick="openAddModal()"><i class="fa-solid fa-user-plus"></i> Add Employee</button>
-          <button class="btn update" onclick="openUpdateModal()"><i class="fa-solid fa-pen-to-square"></i> Update Employee</button>
+          <button class="btn btn-primary" onclick="openAddModal()"><i class="fa-solid fa-user-plus"></i> Add Employee</button>
+          {# <button class="btn update" onclick="openUpdateModal()"><i class="fa-solid fa-pen-to-square"></i> Update Employee</button> #}
         </div>
 
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>Name</th><th>Sex</th><th>Position</th>
-              <th>Department ID</th><th>Phone</th><th>Email</th>
-              <th>Date of birth</th><th>Status</th>
+              <th>ID</th><th>Name</th><th>Sex</th>
+              <th>Position</th>
+              <th>Department</th>
+              <th>Phone</th><th>Email</th>
+              <th>Date of Birth</th><th>Status</th>
             </tr>
           </thead>
           <tbody>
-            
-            {% for nv in nhan_viens %}
-            <tr>
-                <td>{{ nv.EmployeeID }}</td>
-                <td>{{ nv.FullName }}</td>
-                <td>{{ nv.DateOfBirth }}</td>
-                <td>{{ nv.PhoneNumber }}</td>
-                <td>{{ nv.Email }}</td>
-                <td>{{ nv.HireDate }}</td>
-                <td>{{ nv.DepartmentID }}</td>
-                <td>{{ nv.PositionID }}</td>
-                <td>{{ nv.Status }}</td>
-                <td>
 
-                </td>
+            {% for nv in nhan_viens %}
+
+            <tr class="employee-row"
+                data-employee-id="{{ nv.EmployeeID }}"
+                data-department-id="{{ nv.DepartmentID }}"
+                data-position-id="{{ nv.PositionID }}"
+                data-full-name="{{ nv.FullName }}"
+                data-gender="{{ nv.Gender }}"
+                data-phone="{{ nv.PhoneNumber }}"
+                data-email="{{ nv.Email }}"
+                data-dob="{{ nv.DateOfBirth }}" {# Cần đảm bảo định dạng ngày phù hợp #}
+                data-status="{{ nv.Status }}">
+              <td>{{ nv.EmployeeID }}</td>
+              <td>{{ nv.FullName }}</td>
+              <td>{{ nv.Gender }}</td>
+              <td>{{ nv.PositionName }}</td>
+              <td>{{ nv.DepartmentName }}</td>
+              <td>{{ nv.PhoneNumber }}</td>
+              <td>{{ nv.Email }}</td>
+              <td>{{ nv.DateOfBirth }}</td>
+              <td>{{ nv.Status }}</td>
+
             </tr>
             {% endfor %}
           </tbody>
@@ -274,49 +421,84 @@
     </main>
   </div>
 
-  <!-- Modal for Add Employee -->
+  {# Modal for Add Employee #}
   <div class="modal" id="addEmployeeModal">
     <div class="modal-content">
       <span class="close" onclick="closeAddModal()">&times;</span>
       <h2>Add Employee</h2>
-      <form>
+      <form action="{{ url_for('add_employee') }}" method="POST">
         <div class="form-grid">
-          <label>ID <input type="text" value="99334" /></label>
-          <label>Phone <input type="text" value="0904-336-887" /></label>
-          <label>Name <input type="text" value="John Anderson" /></label>
-          <label>Email <input type="email" value="johnanderson@gmail.com" /></label>
-          <label>Sex <input type="text" value="Male" /></label>
-          <label>Date of Birth <input type="text" value="09/04/1990" /></label>
-          <label>Position <input type="text" value="Developer" /></label>
-          <label>Status <input type="text" value="Good" /></label>
-          <label>Department ID <input type="text" value="0002" /></label>
-          <button type="submit" class="btn add">Add Employee</button>
+          <label>Name <input type="text" name="full_name" required/></label>
+          <label>Phone <input type="text" name="phone" required/></label>
+          <label>Sex <input type="text" name="gender" required/></label>
+          <label>Email <input type="email" name="email" required/></label>
+          <label>Position               
+            <select id="add-position-id" name="position_id">
+                  <option value="">-- Select Position --</option>
+                  {% for pos in positions %}
+                      <option value="{{ pos.PositionID }}">{{ pos.PositionName }}</option>
+                  {% endfor %}
+              </select>
+            </label>
+          <label>Date of Birth <input type="date" name="dob" required/></label>
+          <label>Department ID               
+            <select id="add-department-id" name="department_id">
+                  <option value="">-- Select Department --</option>
+                  {% for dept in departments %}
+                      <option value="{{ dept.DepartmentID }}">{{ dept.DepartmentName }}</option>
+                  {% endfor %}
+              </select>
+            </label>
+          <label>Status <input type="text" name="status" required/></label>
+          <button type="submit" class="btn btn-primary">Add Employee</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Modal for Update Employee -->
+  {# Modal for Update Employee #}
   <div class="modal" id="editEmployeeModal">
     <div class="modal-content">
       <span class="close" onclick="closeUpdateModal()">&times;</span>
       <h2>Edit Employee</h2>
-      <form>
+
+      <form action="{{ url_for('update_employee') }}" method="POST">
         <div class="form-grid">
-          <label>ID <input type="text" value="99334" /></label>
-          <label>Phone <input type="text" value="0922-334-556" /></label>
-          <label>Name <input type="text" value="Minh Thanh" /></label>
-          <label>Email <input type="email" value="minhthanh@gmail.com" /></label>
-          <label>Sex <input type="text" value="Male" /></label>
-          <label>Date of Birth <input type="text" value="30/01/2004" /></label>
-          <label>Position <input type="text" value="Junior Data Analyst" /></label>
-          <label>Status <input type="text" value="Good" /></label>
-          <label>Department ID <input type="text" value="0001" /></label>
-          <button type="submit" class="btn update">Update</button>
+           <label>ID <input id="edit-id" name="employee_id" type="text" readonly required /></label>
+          <label>Name <input id="edit-name" name="full_name" type="text" required /></label>
+          <label>Sex <input id="edit-sex" name="gender" type="text" /></label>
+
+          <label>Position ID               
+            <select id="edit-position" name="position_id">
+                  <option value="">-- Select Position --</option>
+                  {% for pos in positions %}
+                      <option value="{{ pos.PositionID }}">{{ pos.PositionName }}</option>
+                  {% endfor %}
+              </select>
+          </label>
+          <label>Department ID               
+            <select id="edit-department" name="department_id">
+                  <option value="">-- Select Department --</option>
+                  {% for dept in departments %}
+                      <option value="{{ dept.DepartmentID }}">{{ dept.DepartmentName }}</option>
+                  {% endfor %}
+              </select></label>
+
+          <label>Phone <input id="edit-phone" name="phone" type="text" /></label>
+          <label>Email <input id="edit-email" name="email" type="email" /></label>
+          <label>Date of Birth <input id="edit-dob" name="dob" type="date" required /></label>
+          <label>Status <input id="edit-status" name="status" type="text" /></label>
+
+          <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Update</button>
+              {# Nút Xóa trong modal - gọi hàm xóa từ modal #}
+              <button type="button" class="btn btn-danger" onclick="deleteEmployeeFromModal(document.getElementById('edit-id').value)"><i class="fa-solid fa-trash"></i> Xóa</button>
+          </div>
         </div>
       </form>
     </div>
   </div>
+
 
   <script>
     // Open Add Employee Modal
@@ -329,7 +511,7 @@
       document.getElementById('addEmployeeModal').style.display = 'none';
     }
 
-    // Open Update Employee Modal
+    // Open Update Employee Modal (generic)
     function openUpdateModal() {
       document.getElementById('editEmployeeModal').style.display = 'flex';
     }
@@ -338,6 +520,108 @@
     function closeUpdateModal() {
       document.getElementById('editEmployeeModal').style.display = 'none';
     }
+
+    // *** Đã THÊM: Hàm điền dữ liệu vào modal từ hàng (<tr>) được click ***
+    function populateModalFromRow(row) {
+        // Lấy dữ liệu từ data-* attributes của hàng
+        const employeeId = row.getAttribute('data-employee-id');
+        const fullName = row.getAttribute('data-full-name');
+        const gender = row.getAttribute('data-gender');
+        const positionId = row.getAttribute('data-position-id'); 
+        const departmentId = row.getAttribute('data-department-id'); 
+        const phone = row.getAttribute('data-phone');
+        const email = row.getAttribute('data-email');
+        const dob = row.getAttribute('data-dob'); 
+        const status = row.getAttribute('data-status');
+
+        // Điền dữ liệu vào form chỉnh sửa
+        document.getElementById("edit-id").value = employeeId;
+        document.getElementById("edit-name").value = fullName;
+        document.getElementById("edit-sex").value = gender;
+        document.getElementById("edit-position").value = positionId !== 'None' ? positionId : '';
+        document.getElementById("edit-department").value = departmentId !== 'None' ? departmentId : '';
+        document.getElementById("edit-phone").value = phone !== 'None' ? phone : '';
+        document.getElementById("edit-email").value = email !== 'None' ? email : '';
+
+        if (dob && dob !== 'N/A' && dob !== 'None') {
+             document.getElementById("edit-dob").value = dob;
+        } else {
+             document.getElementById("edit-dob").value = ""; 
+        }
+
+        document.getElementById("edit-status").value = status !== 'None' ? status : '';
+
+        // Mở modal chỉnh sửa
+        openUpdateModal();
+    }
+
+
+    // Gắn sự kiện click cho mỗi hàng nhân viên 
+    document.querySelectorAll("tbody tr.employee-row").forEach(row => {
+      row.addEventListener("click", function () {
+        // Gọi hàm điền dữ liệu và mở modal, truyền chính hàng được click vào
+        populateModalFromRow(this);
+      });
+    });
+
+
+    // Hàm xóa nhân viên từ modal
+    function deleteEmployeeFromModal(employeeId) {
+      // Xác nhận trước khi xóa
+      if (confirm(`Bạn có chắc chắn muốn xóa nhân viên ID ${employeeId} không?`)) {
+        // Gửi yêu cầu DELETE đến Flask route
+        fetch(`/delete-employee/${employeeId}`, {
+          method: 'DELETE' // Sử dụng phương thức DELETE
+        })
+        .then(response => {
+          // Xử lý phản hồi từ server
+          if (response.ok) {
+            return response.json(); // Parse JSON nếu thành công 
+          } else {
+             // Ném lỗi để bắt ở khối catch, bao gồm thông báo lỗi từ server nếu có
+             return response.json().then(data => {
+                 throw new Error(data.error || 'Lỗi không xác định khi xóa nhân viên');
+             });
+          }
+        })
+        .then(data => {
+          // Xử lý phản hồi thành công
+          alert(data.message); // Hiển thị thông báo thành công
+          closeUpdateModal(); 
+          window.location.reload(); // Tải lại trang
+        })
+        .catch(error => {
+          // Xử lý lỗi
+          console.error('Lỗi xóa nhân viên:', error);
+          alert('Xóa nhân viên thất bại: ' + error.message); // Hiển thị thông báo lỗi
+        });
+      }
+    }
+
+    // Hàm xóa nhân viên trực tiếp từ nút trong bảng
+    function deleteEmployee(employeeId) {
+       if (confirm(`Bạn có chắc chắn muốn xóa nhân viên ID ${employeeId} không?`)) {
+         fetch(`/delete-employee/${employeeId}`, {
+           method: 'DELETE'
+         })
+         .then(response => {
+           if (response.ok) {
+             return response.json();
+           } else {
+              return response.json().then(data => { throw new Error(data.error || 'Lỗi khi xóa nhân viên'); });
+           }
+         })
+         .then(data => {
+           alert(data.message);
+           window.location.reload();
+         })
+         .catch(error => {
+           console.error('Lỗi xóa nhân viên:', error);
+           alert('Xóa nhân viên thất bại: ' + error.message);
+         });
+       }
+    }
+
   </script>
 </body>
 </html>

@@ -1,0 +1,79 @@
+  {# Modal for Update Employee #}
+  <div class="modal" id="editEmployeeModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeUpdateModal()">&times;</span> {# Updated close button #}
+      <h2>Edit Employee</h2>
+
+      <form action="{{ url_for('update_employee') }}" method="POST">
+        <div class="form-grid">
+           {# ID readonly #}
+           <div class="form-group">
+               <label for="edit-employee-id">ID:</label>
+               <input id="edit-employee-id" name="employee_id" type="text" readonly required />
+           </div>
+
+
+           {# Các input khác #}
+           <div class="form-group">
+               <label for="edit-full-name">Full Name:</label>
+               <input id="edit-full-name" name="full_name" type="text" required />
+           </div>
+           <div class="form-group">
+               <label for="edit-gender">Sex:</label>
+               <select id="edit-gender" name="gender">
+                   <option value="">Select Sex</option>
+                   <option value="Male">Male</option>
+                   <option value="Female">Female</option>
+                   <option value="Other">Other</option>
+               </select>
+           </div>
+           <div class="form-group">
+               <label for="edit-phone">Phone:</label>
+               <input id="edit-phone" name="phone" type="text" />
+           </div>
+           <div class="form-group">
+               <label for="edit-email">Email:</label>
+               <input id="edit-email" name="email" type="email" />
+           </div>
+           <div class="form-group">
+               <label for="edit-dob">Date of Birth:</label>
+               <input id="edit-dob" name="dob" type="date" required />
+           </div>
+           <div class="form-group">
+               <label for="edit-status">Status:</label>
+               <input id="edit-status" name="status" type="text" />
+           </div>
+
+          {# *** Đã CHỈNH SỬA: Dropdown cho Position *** #}
+          <div class="form-group">
+              <label for="edit-position-id">Position:</label>
+              <select id="edit-position-id" name="position_id">
+                  <option value="">Select Position</option>
+                  {% for pos in positions %}
+                      <option value="{{ pos.PositionID }}">{{ pos.PositionName }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+          {# *** Đã CHỈNH SỬA: Dropdown cho Department *** #}
+          <div class="form-group">
+              <label for="edit-department-id">Department:</label>
+              <select id="edit-department-id" name="department_id">
+                  <option value="">Select Department</option>
+                  {% for dept in departments %}
+                      <option value="{{ dept.DepartmentID }}">{{ dept.DepartmentName }}</option>
+                  {% endfor %}
+              </select>
+          </div>
+
+
+          {# Container cho các nút #}
+          <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Update</button>
+              {# Nút Xóa trong modal - gọi hàm xóa từ modal #}
+              <button type="button" class="btn btn-danger" onclick="deleteEmployeeFromModal(document.getElementById('edit-employee-id').value)"><i class="fa-solid fa-trash"></i> Delete</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>

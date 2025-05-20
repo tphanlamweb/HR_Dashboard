@@ -132,7 +132,12 @@
       </div>
       <div class="right-side">
         <h2>HR Dash Board</h2>
-        <form>
+
+          {% if error %}
+              <p style="color: red; font-weight: bold;">{{ error }}</p>
+          {% endif %}
+
+        <form method="POST" action="{{ url_for('index') }}">
           <div class="input-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" placeholder="Enter your username" required>
